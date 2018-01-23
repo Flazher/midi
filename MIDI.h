@@ -2,6 +2,8 @@
 // Created by flazher on 23.01.18.
 //
 
+#include <stdlib.h>
+#include <list>
 #include "util.h"
 
 struct chunk {
@@ -16,27 +18,24 @@ struct header_chunk_data {
     char division[2];
 };
 
-struct midi_track {
-    midi_event* events;
-};
-
 struct midi_event {
-    int delta_time;
+    unsigned int delta_time;
     byte status;
     byte* data;
 };
 
-class midi {
+class MIDI {
     public:
         int delta_per_quarter;
         int midi_type;
         int track_chunks_count;
-        midi_track* tracks;
+        std::list<midi_event*> events;
 
-        static midi* read(char* filename);
-        midi(char* filename);
+        static MIDI* read(char* filename);
+        MIDI(char* filename);
     private:
         static chunk* read_chunk(ifstream& stream);
         void process_header_chunk(chunk* chunk);
         void process_track_chunk(chunk* chunk);
+        unsigned int get_delta_time(byte* first_byte, int* carriage);
 };
